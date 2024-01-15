@@ -10,6 +10,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const skipAmount = searchParams.get("sk");
     const takeAmount = searchParams.get("tk");
+    const authorId = searchParams.get("author");
 
     if (!skipAmount || !takeAmount) return new Response("Bad request", { status: 400 });
 
@@ -18,27 +19,52 @@ export async function GET(req: Request) {
 
     if (takeNum >= 10) return new Response("Bad request", { status: 400 });
 
-    const posts: ExpandedPost[] = await db.post.findMany({
-      skip: skipNum,
-      take: takeNum,
-      orderBy: {
-        createdAt: "desc"
-      },
-      include: {
-        author: {
-          select: {
-            name: true
+    const posts: ExpandedPost[] = authorId
+      ? await db.post.findMany({
+          skip: skipNum,
+          take: takeNum,
+          orderBy: {
+            createdAt: "desc"
+          },
+          where: {
+            authorId
+          },
+          include: {
+            author: {
+              select: {
+                name: true
+              }
+            },
+            _count: {
+              select: {
+                comments: true,
+                likes: true,
+                dislikes: true
+              }
+            }
           }
-        },
-        _count: {
-          select: {
-            comments: true,
-            likes: true,
-            dislikes: true
+        })
+      : await db.post.findMany({
+          skip: skipNum,
+          take: takeNum,
+          orderBy: {
+            createdAt: "desc"
+          },
+          include: {
+            author: {
+              select: {
+                name: true
+              }
+            },
+            _count: {
+              select: {
+                comments: true,
+                likes: true,
+                dislikes: true
+              }
+            }
           }
-        }
-      }
-    });
+        });
 
     if (signedIn) {
       const postsWithSignedInVoteData: ExpandedPost[] = await Promise.all(

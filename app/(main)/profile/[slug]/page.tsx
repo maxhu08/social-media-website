@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { UserPostsFeed } from "~/components/posts/user-posts-feed";
 import { getAuthSession } from "~/lib/auth";
 import { db } from "~/lib/db";
@@ -6,6 +7,27 @@ import { formatDateAgo } from "~/lib/utils";
 interface PageProps {
   params: {
     slug: string;
+  };
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const user = await db.user.findFirst({
+    where: {
+      id: params.slug
+    },
+    select: {
+      name: true
+    }
+  });
+
+  if (!user) {
+    return {
+      title: "user not found"
+    };
+  }
+
+  return {
+    title: user.name
   };
 }
 

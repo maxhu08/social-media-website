@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { CommentsFeed } from "~/components/comments/comments-feed";
 import { CreateCommentForm } from "~/components/comments/create-comment-form";
 import { PostComponent } from "~/components/posts/post-component";
@@ -8,6 +9,29 @@ import { ExpandedPost } from "~/types";
 interface PageProps {
   params: {
     slug: string;
+  };
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const post = await db.post.findFirst({
+    where: {
+      id: params.slug
+    },
+    select: {
+      title: true,
+      content: true
+    }
+  });
+
+  if (!post) {
+    return {
+      title: "post not found"
+    };
+  }
+
+  return {
+    title: post.title,
+    description: post.content
   };
 }
 

@@ -14,4 +14,4 @@
 
 <!-- voting for posts and comments -->
 
-user profile page
+<!-- user profile page -->
