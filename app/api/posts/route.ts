@@ -78,9 +78,7 @@ export async function GET(req: Request) {
       );
 
       return Response.json(postsWithSignedInVoteData);
-    }
-
-    return Response.json(posts);
+    } else return Response.json(posts);
   } catch (err) {
     console.log("[POSTS_GET]", err);
     return new Response("Internal Error", { status: 500 });

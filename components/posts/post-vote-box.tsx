@@ -22,7 +22,7 @@ export const PostVoteBox: FC<PostVoteBoxProps> = ({ post, signedIn }) => {
   const handleLike = async () => {
     if (!signedIn) return;
 
-    if (signedInVoteType) {
+    if (signedInVoteType === null) {
       await axios.post(`/api/posts/votes/create?pid=${post.id}&type=${"LIKE"}`);
       setLikeCount((prev) => prev + 1);
       setSignedInVoteType("LIKE");
@@ -30,14 +30,14 @@ export const PostVoteBox: FC<PostVoteBoxProps> = ({ post, signedIn }) => {
     }
 
     if (signedInVoteType === "LIKE") {
-      await axios.post(`/api/posts/votes/delete?pid=${post.id}`);
+      await axios.delete(`/api/posts/votes/delete?pid=${post.id}`);
       setLikeCount((prev) => prev - 1);
       setSignedInVoteType(null);
       return;
     }
 
     if (signedInVoteType === "DISLIKE") {
-      await axios.post(`/api/posts/votes/modify?pid=${post.id}&type=${"LIKE"}`);
+      await axios.patch(`/api/posts/votes/switch?pid=${post.id}`);
       setLikeCount((prev) => prev + 1);
       setDislikeCount((prev) => prev - 1);
       setSignedInVoteType("LIKE");
@@ -48,7 +48,7 @@ export const PostVoteBox: FC<PostVoteBoxProps> = ({ post, signedIn }) => {
   const handleDislike = async () => {
     if (!signedIn) return;
 
-    if (signedInVoteType) {
+    if (signedInVoteType === null) {
       await axios.post(`/api/posts/votes/create?pid=${post.id}&type=${"DISLIKE"}`);
       setDislikeCount((prev) => prev + 1);
       setSignedInVoteType("DISLIKE");
@@ -56,7 +56,8 @@ export const PostVoteBox: FC<PostVoteBoxProps> = ({ post, signedIn }) => {
     }
 
     if (signedInVoteType === "LIKE") {
-      await axios.post(`/api/posts/votes/modify?pid=${post.id}&type=${"DISLIKE"}`);
+      console.log("tesasdfasdfasdf");
+      await axios.patch(`/api/posts/votes/switch?pid=${post.id}`);
       setLikeCount((prev) => prev - 1);
       setDislikeCount((prev) => prev + 1);
       setSignedInVoteType("DISLIKE");
@@ -64,7 +65,7 @@ export const PostVoteBox: FC<PostVoteBoxProps> = ({ post, signedIn }) => {
     }
 
     if (signedInVoteType === "DISLIKE") {
-      await axios.post(`/api/posts/votes/delete?pid=${post.id}`);
+      await axios.delete(`/api/posts/votes/delete?pid=${post.id}`);
       setDislikeCount((prev) => prev - 1);
       setSignedInVoteType(null);
       return;
