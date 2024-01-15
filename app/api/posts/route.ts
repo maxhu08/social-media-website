@@ -41,7 +41,7 @@ export async function GET(req: Request) {
     });
 
     if (signedIn) {
-      const postsWithSignedInVoteData = await Promise.all(
+      const postsWithSignedInVoteData: ExpandedPost[] = await Promise.all(
         posts.map(async (post) => {
           const existingLike = await db.postLike.findFirst({
             where: {

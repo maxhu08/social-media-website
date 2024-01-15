@@ -24,4 +24,11 @@ export type ExpandedComment = Comment & {
   author: {
     name: string;
   };
+  _count: {
+    likes: number;
+    dislikes: number;
+  };
+  signedInVote?: {
+    type: "LIKE" | "DISLIKE";
+  };
 };

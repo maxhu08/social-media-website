@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FC, useState } from "react";
 import { CommentActions } from "~/components/comments/comment-actions";
+import { CommentVoteBox } from "~/components/comments/comment-vote-box";
 import { EditCommentForm } from "~/components/comments/edit-comment-form";
 import { formatDateAgo } from "~/lib/utils";
 import { ExpandedComment, Session } from "~/types";
@@ -34,6 +35,9 @@ export const CommentComponent: FC<CommentComponentProps> = ({ comment, session }
             )}
           </div>
           <p className="overflow-hidden break-words whitespace-pre-wrap">{commentContent}</p>
+          <div className="w-max">
+            <CommentVoteBox comment={comment} signedIn={!!session} />
+          </div>
         </div>
       )}
       {state === "editing" && (

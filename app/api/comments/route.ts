@@ -1,8 +1,12 @@
+import { getAuthSession } from "~/lib/auth";
 import { db } from "~/lib/db";
 import { ExpandedComment } from "~/types";
 
 export async function GET(req: Request) {
   try {
+    const session = await getAuthSession();
+    const signedIn = !!session;
+
     const { searchParams } = new URL(req.url);
     const postId = searchParams.get("pid");
     const skipAmount = searchParams.get("sk");
@@ -38,11 +42,57 @@ export async function GET(req: Request) {
           select: {
             name: true
           }
+        },
+        _count: {
+          select: {
+            likes: true,
+            dislikes: true
+          }
         }
       }
     });
 
-    return Response.json(comments);
+    if (signedIn) {
+      const commentsWithSignedInVoteData: ExpandedComment[] = await Promise.all(
+        comments.map(async (comment) => {
+          const existingLike = await db.commentLike.findFirst({
+            where: {
+              authorId: session.id,
+              commentId: comment.id
+            }
+          });
+
+          if (existingLike) {
+            return {
+              ...comment,
+              signedInVote: {
+                type: "LIKE"
+              }
+            };
+          }
+
+          const existingDislike = await db.commentDislike.findFirst({
+            where: {
+              authorId: session.id,
+              commentId: post.id
+            }
+          });
+
+          if (existingDislike) {
+            return {
+              ...comment,
+              signedInVote: {
+                type: "DISLIKE"
+              }
+            };
+          }
+
+          return comment;
+        })
+      );
+
+      return Response.json(commentsWithSignedInVoteData);
+    } else return Response.json(comments);
   } catch (err) {
     console.log("[COMMENTS_GET]", err);
     return new Response("Internal Error", { status: 500 });
