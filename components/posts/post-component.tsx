@@ -10,9 +10,10 @@ interface PostComponentProps {
   post: ExpandedPost;
   isOnFeed: boolean;
   session: Session | null;
+  signedIn: boolean;
 }
 
-export const PostComponent: FC<PostComponentProps> = ({ post, isOnFeed, session }) => {
+export const PostComponent: FC<PostComponentProps> = ({ post, isOnFeed, session, signedIn }) => {
   return (
     <div className="bg-neutral-200 dark:bg-neutral-800 p-2 sm:rounded-md overflow-auto">
       <div className="grid grid-flow-row gap-1">
@@ -39,7 +40,7 @@ export const PostComponent: FC<PostComponentProps> = ({ post, isOnFeed, session 
         )}
       </div>
       <div className="grid grid-flow-col w-max gap-1 place-items-center">
-        <PostVoteBox post={post} />
+        <PostVoteBox post={post} signedIn={signedIn} />
         <div>
           <div className="w-max">
             {isOnFeed && (

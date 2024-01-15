@@ -18,10 +18,11 @@ export const PostsFeed: FC<PostsFeedProps> = ({ session }) => {
   const fetchMoreAmount = 3;
   const lastElementRef = useRef<HTMLDivElement>(null);
   const context = useContext(Context);
+  const signedIn = !!session;
 
   useEffect(() => {
     if (context.value.deletedPost.postId !== null) {
-      const updatedPosts = posts.filter(post => post.id !== context.value.deletedPost.postId);
+      const updatedPosts = posts.filter((post) => post.id !== context.value.deletedPost.postId);
 
       setPosts(updatedPosts);
       context.setValue({ ...context.value, deletedPost: { postId: null } });
@@ -33,19 +34,21 @@ export const PostsFeed: FC<PostsFeedProps> = ({ session }) => {
       if (dontFetch) return;
       try {
         const initialFetchLink = `/api/posts?sk=${skip}&tk=${initialFetchAmount}`;
-        const fetchLink = `/api/posts?sk=${skip + initialFetchAmount - fetchMoreAmount}&tk=${fetchMoreAmount}`;
+        const fetchLink = `/api/posts?sk=${
+          skip + initialFetchAmount - fetchMoreAmount
+        }&tk=${fetchMoreAmount}`;
         const res = await axios.get(skip === 0 ? initialFetchLink : fetchLink);
 
         const newPosts = res.data;
 
         if (newPosts.length === 0) {
-          setPosts(prevPosts => [...prevPosts, ...newPosts]);
+          setPosts((prevPosts) => [...prevPosts, ...newPosts]);
           setDontFetch(true);
           return;
         }
 
-        setPosts(prevPosts => [...prevPosts, ...newPosts]);
-        setSkip(prevSkip => prevSkip + fetchMoreAmount);
+        setPosts((prevPosts) => [...prevPosts, ...newPosts]);
+        setSkip((prevSkip) => prevSkip + fetchMoreAmount);
 
         setDontFetch(false);
       } catch (err) {
@@ -56,7 +59,7 @@ export const PostsFeed: FC<PostsFeedProps> = ({ session }) => {
     const lastEl = lastElementRef.current;
     if (!lastEl) return;
 
-    const observer = new IntersectionObserver(entries => {
+    const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting) {
         fetchMorePosts();
       }
@@ -70,8 +73,14 @@ export const PostsFeed: FC<PostsFeedProps> = ({ session }) => {
   return (
     <div>
       <div className="grid grid-flow-row gap-2">
-        {posts.map(post => (
-          <PostComponent post={post} key={post.id} session={session} isOnFeed={true} />
+        {posts.map((post) => (
+          <PostComponent
+            post={post}
+            key={post.id}
+            session={session}
+            isOnFeed={true}
+            signedIn={signedIn}
+          />
         ))}
       </div>
       <div className="relative">

@@ -1,8 +1,12 @@
+import { getAuthSession } from "~/lib/auth";
 import { db } from "~/lib/db";
 import { ExpandedPost } from "~/types";
 
 export async function GET(req: Request) {
   try {
+    const session = await getAuthSession();
+    const signedIn = !!session;
+
     const { searchParams } = new URL(req.url);
     const skipAmount = searchParams.get("sk");
     const takeAmount = searchParams.get("tk");
@@ -35,6 +39,46 @@ export async function GET(req: Request) {
         }
       }
     });
+
+    if (signedIn) {
+      const postsWithSignedInVoteData = await Promise.all(
+        posts.map(async (post) => {
+          const existingLike = await db.postLike.findFirst({
+            where: {
+              authorId: session.id,
+              postId: post.id
+            }
+          });
+
+          if (existingLike) {
+            return {
+              ...post,
+              signedInVote: {
+                type: "LIKE"
+              }
+            };
+          }
+
+          const existingDislike = await db.postDislike.findFirst({
+            where: {
+              authorId: session.id,
+              postId: post.id
+            }
+          });
+
+          if (existingDislike) {
+            return {
+              ...post,
+              signedInVote: {
+                type: "DISLIKE"
+              }
+            };
+          }
+        })
+      );
+
+      return Response.json(postsWithSignedInVoteData);
+    }
 
     return Response.json(posts);
   } catch (err) {
