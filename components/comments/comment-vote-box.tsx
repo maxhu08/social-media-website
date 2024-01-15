@@ -23,21 +23,21 @@ export const CommentVoteBox: FC<CommentVoteBoxProps> = ({ comment, signedIn }) =
     if (!signedIn) return;
 
     if (signedInVoteType === null) {
-      await axios.post(`/api/comments/votes/create?pid=${comment.id}&type=${"LIKE"}`);
+      await axios.post(`/api/comments/votes/create?cid=${comment.id}&type=${"LIKE"}`);
       setLikeCount((prev) => prev + 1);
       setSignedInVoteType("LIKE");
       return;
     }
 
     if (signedInVoteType === "LIKE") {
-      await axios.delete(`/api/comments/votes/delete?pid=${comment.id}`);
+      await axios.delete(`/api/comments/votes/delete?cid=${comment.id}`);
       setLikeCount((prev) => prev - 1);
       setSignedInVoteType(null);
       return;
     }
 
     if (signedInVoteType === "DISLIKE") {
-      await axios.patch(`/api/comments/votes/switch?pid=${comment.id}`);
+      await axios.patch(`/api/comments/votes/switch?cid=${comment.id}`);
       setLikeCount((prev) => prev + 1);
       setDislikeCount((prev) => prev - 1);
       setSignedInVoteType("LIKE");
@@ -49,15 +49,14 @@ export const CommentVoteBox: FC<CommentVoteBoxProps> = ({ comment, signedIn }) =
     if (!signedIn) return;
 
     if (signedInVoteType === null) {
-      await axios.post(`/api/comments/votes/create?pid=${comment.id}&type=${"DISLIKE"}`);
+      await axios.post(`/api/comments/votes/create?cid=${comment.id}&type=${"DISLIKE"}`);
       setDislikeCount((prev) => prev + 1);
       setSignedInVoteType("DISLIKE");
       return;
     }
 
     if (signedInVoteType === "LIKE") {
-      console.log("tesasdfasdfasdf");
-      await axios.patch(`/api/comments/votes/switch?pid=${comment.id}`);
+      await axios.patch(`/api/comments/votes/switch?cid=${comment.id}`);
       setLikeCount((prev) => prev - 1);
       setDislikeCount((prev) => prev + 1);
       setSignedInVoteType("DISLIKE");
@@ -65,7 +64,7 @@ export const CommentVoteBox: FC<CommentVoteBoxProps> = ({ comment, signedIn }) =
     }
 
     if (signedInVoteType === "DISLIKE") {
-      await axios.delete(`/api/comments/votes/delete?pid=${comment.id}`);
+      await axios.delete(`/api/comments/votes/delete?cid=${comment.id}`);
       setDislikeCount((prev) => prev - 1);
       setSignedInVoteType(null);
       return;

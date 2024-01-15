@@ -12,6 +12,6 @@
 
 <!-- edit and delete on comments -->
 
-voting for posts and comments
+<!-- voting for posts and comments -->
 
 user profile page

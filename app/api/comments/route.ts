@@ -74,7 +74,7 @@ export async function GET(req: Request) {
           const existingDislike = await db.commentDislike.findFirst({
             where: {
               authorId: session.id,
-              commentId: post.id
+              commentId: comment.id
             }
           });
 

@@ -2,8 +2,14 @@
 
 import { LogIn, User } from "lucide-react";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { FC } from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "~/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "~/components/ui/dropdown-menu";
 import { Session } from "~/types";
 
 interface UserOptionsProps {
@@ -11,6 +17,8 @@ interface UserOptionsProps {
 }
 
 export const UserOptions: FC<UserOptionsProps> = ({ session }) => {
+  const router = useRouter();
+
   return (
     <div>
       <DropdownMenu modal={false}>
@@ -26,7 +34,9 @@ export const UserOptions: FC<UserOptionsProps> = ({ session }) => {
               <LogIn className="w-4 h-4 ml-auto" />
             </div>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => {}} className="cursor-pointer">
+          <DropdownMenuItem
+            onClick={() => router.push(`/profile/${session.id}`)}
+            className="cursor-pointer">
             <div className="flex place-items-center w-full gap-2">
               <span>View profile</span>
               <User className="w-4 h-4 ml-auto" />
