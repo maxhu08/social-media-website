@@ -44,7 +44,7 @@ export const PostComponent: FC<PostComponentProps> = ({ post, isOnFeed, session 
           <div className="w-max">
             {isOnFeed && (
               <Link href={`/posts/${post.id}`} className="w-full">
-                <div className="grid grid-cols-[max-content_max-content] gap-1 place-items-center p-1 hover:bg-black/20 dark:hover:bg-white/20 w-max rounded-md transition cursor-pointer">
+                <div className="grid grid-flow-col gap-1 place-items-center border-[1px] hover:bg-black/20 dark:hover:bg-white/20 transition border-zinc-400 dark:border-zinc-500 rounded-md px-1">
                   <MessagesSquare className="w-4 h-4" />
                   <span>{post._count.comments}</span>
                 </div>
