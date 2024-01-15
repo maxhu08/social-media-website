@@ -15,22 +15,60 @@ export const PostVoteBox: FC<PostVoteBoxProps> = ({ post, signedIn }) => {
   const [likeCount, setLikeCount] = useState(post._count.likes);
   const [dislikeCount, setDislikeCount] = useState(post._count.dislikes);
 
-  const [signedInVoteType, setSignedInVoteType] = useState(post.signedInVote?.type);
+  const [signedInVoteType, setSignedInVoteType] = useState(
+    post.signedInVote?.type ? post.signedInVote.type : null
+  );
 
   const handleLike = async () => {
     if (!signedIn) return;
 
-    await axios.post(`/api/posts/votes/create?pid=${post.id}&type=${"LIKE"}`);
-    setLikeCount((prev) => prev + 1);
-    setSignedInVoteType("LIKE");
+    if (signedInVoteType) {
+      await axios.post(`/api/posts/votes/create?pid=${post.id}&type=${"LIKE"}`);
+      setLikeCount((prev) => prev + 1);
+      setSignedInVoteType("LIKE");
+      return;
+    }
+
+    if (signedInVoteType === "LIKE") {
+      await axios.post(`/api/posts/votes/delete?pid=${post.id}`);
+      setLikeCount((prev) => prev - 1);
+      setSignedInVoteType(null);
+      return;
+    }
+
+    if (signedInVoteType === "DISLIKE") {
+      await axios.post(`/api/posts/votes/modify?pid=${post.id}&type=${"LIKE"}`);
+      setLikeCount((prev) => prev + 1);
+      setDislikeCount((prev) => prev - 1);
+      setSignedInVoteType("LIKE");
+      return;
+    }
   };
 
-  const handleDisLike = async () => {
+  const handleDislike = async () => {
     if (!signedIn) return;
 
-    await axios.post(`/api/posts/votes/create?pid=${post.id}&type=${"DISLIKE"}`);
-    setDislikeCount((prev) => prev + 1);
-    setSignedInVoteType("DISLIKE");
+    if (signedInVoteType) {
+      await axios.post(`/api/posts/votes/create?pid=${post.id}&type=${"DISLIKE"}`);
+      setDislikeCount((prev) => prev + 1);
+      setSignedInVoteType("DISLIKE");
+      return;
+    }
+
+    if (signedInVoteType === "LIKE") {
+      await axios.post(`/api/posts/votes/modify?pid=${post.id}&type=${"DISLIKE"}`);
+      setLikeCount((prev) => prev - 1);
+      setDislikeCount((prev) => prev + 1);
+      setSignedInVoteType("DISLIKE");
+      return;
+    }
+
+    if (signedInVoteType === "DISLIKE") {
+      await axios.post(`/api/posts/votes/delete?pid=${post.id}`);
+      setDislikeCount((prev) => prev - 1);
+      setSignedInVoteType(null);
+      return;
+    }
   };
 
   return (
@@ -47,7 +85,7 @@ export const PostVoteBox: FC<PostVoteBoxProps> = ({ post, signedIn }) => {
         <span>{likeCount}</span>
       </button>
       <button
-        onClick={handleDisLike}
+        onClick={handleDislike}
         className={cn(
           "grid grid-flow-col gap-1 place-items-center border-[1px] hover:bg-black/20 dark:hover:bg-white/20 transition rounded-md px-1",
           signedInVoteType === "DISLIKE"
