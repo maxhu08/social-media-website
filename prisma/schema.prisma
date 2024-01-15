@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String @id @default(uuid())
+  name     String @unique
+  email    String @unique
+  password String
+
+  posts           Post[]
+  comments        Comment[]
+  postLikes       PostLike[]
+  postDislikes    PostDislike[]
+  commentLikes    CommentLike[]
+  commentDislikes CommentDislike[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Post {
+  id      String @id @default(uuid())
+  title   String @db.Text
+  content String @db.Text
+
+  author   User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+  comments Comment[]
+  likes    PostLike[]
+  dislikes PostDislike[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PostLike {
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+
+  @@unique([authorId, postId])
+}
+
+model PostDislike {
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+
+  @@unique([authorId, postId])
+}
+
+model Comment {
+  id      String @id @default(uuid())
+  content String @db.Text
+
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+
+  author   User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+  likes    CommentLike[]
+  dislikes CommentDislike[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CommentLike {
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String
+
+  @@unique([authorId, commentId])
+}
+
+model CommentDislike {
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String
+
+  @@unique([authorId, commentId])
+}
