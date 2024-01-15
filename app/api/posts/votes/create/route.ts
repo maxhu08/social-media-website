@@ -55,7 +55,7 @@ export async function POST(req: Request) {
     }
 
     if (voteType === "DISLIKE") {
-      await db.postLike.create({
+      await db.postDislike.create({
         data: {
           postId,
           authorId: session.id
